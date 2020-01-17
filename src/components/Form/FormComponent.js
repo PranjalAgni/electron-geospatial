@@ -1,23 +1,41 @@
+import { Field, useField, withFormik } from 'formik';
+import { Alert, Button, Container, Form, Row } from 'react-bootstrap';
+import { withRouter } from 'react-router-dom';
 import React, { useDispatch, useGlobal } from 'reactn';
-import { Form, Container, Row, Button, Alert } from 'react-bootstrap';
-import { Field, withFormik, useField } from 'formik';
-import './form.css';
 import * as Yup from 'yup';
-
 const EnhancedTextField = props => {
   const [field, meta] = useField(props);
   console.log('Field:  ', field);
   console.log('Meta:  ', meta);
-  const errorText = meta.touched && meta.error && (
-    <Alert variant={'danger'}> {meta.error} </Alert>
-  );
-  return (
-    <>
-      {errorText}
-      <Field {...field} {...props} />
-    </>
+
+  return <Field {...field} {...props} />;
+};
+
+const SweetAlert = props => {
+  const { touched, smsg, errors } = props;
+  let { fmsg = 'Oh snap! You got' } = props;
+  console.log(touched);
+  const errorsInfo = Object.values(errors);
+  const touchedInfo = Object.values(touched);
+  if (!touchedInfo.length) return null;
+  const hasErrors = errorsInfo.length > 0;
+  fmsg += errorsInfo.length > 1 ? ' errors!' : ' an error!';
+  const variant = hasErrors ? 'danger' : 'success';
+  return hasErrors ? (
+    <Alert variant={variant}>
+      <Alert.Heading>{fmsg}</Alert.Heading>
+      {Object.values(errors).map((err, idx) => (
+        <p key={`p-${idx}`}>{err}</p>
+      ))}
+    </Alert>
+  ) : (
+    <Alert variant={variant}>
+      <Alert.Heading>{smsg}</Alert.Heading>
+      <p> You got it right </p>
+    </Alert>
   );
 };
+
 function FormComponent({ values, errors, touched }) {
   const [point] = useGlobal('points');
   const setPoints = useDispatch(
@@ -27,7 +45,14 @@ function FormComponent({ values, errors, touched }) {
 
   return (
     <Container className="justify-content-md-center">
-      <Form className="mt-5">
+      <Row className="pt-2 justify-content-md-center">
+        <SweetAlert
+          touched={touched}
+          errors={errors}
+          smsg="Hey, nice to see you"
+        />
+      </Row>
+      <Form className="mt-3">
         <Row className="justify-content-md-center">
           <Form.Group className="w-50 mt-5" controlId="formLat">
             <Row className="justify-content-md-center">
@@ -76,8 +101,8 @@ function FormComponent({ values, errors, touched }) {
 
 const EnhancedForms = withFormik({
   mapPropsToValues: () => ({
-    latitude: null,
-    longitude: null
+    latitude: '',
+    longitude: ''
   }),
   validationSchema: Yup.object().shape({
     latitude: Yup.number()
@@ -93,4 +118,4 @@ const EnhancedForms = withFormik({
   }
 })(FormComponent);
 
-export default EnhancedForms;
+export default withRouter(EnhancedForms);
