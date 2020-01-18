@@ -1,12 +1,26 @@
 import { Field, useField, withFormik } from 'formik';
+import trueRandom from 'random-number-csprng';
 import { Alert, Button, Container, Form, Row } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom';
 import React, { useDispatch, useGlobal } from 'reactn';
 import * as Yup from 'yup';
+
+const generateRandomPoint = async (to, from, fixed) => {
+  const val = await trueRandom(from, to);
+  return val.toFixed(fixed);
+};
+
+const genratePoints = async () => {
+  const obj = {
+    latitude: await generateRandomPoint(90, -90, 3),
+    longitude: await generateRandomPoint(180, -180, 3)
+  };
+  console.log(obj);
+  return obj;
+};
+
 const EnhancedTextField = props => {
-  const [field, meta] = useField(props);
-  console.log('Field:  ', field);
-  console.log('Meta:  ', meta);
+  const [field] = useField(props);
 
   return <Field {...field} {...props} />;
 };
@@ -14,7 +28,6 @@ const EnhancedTextField = props => {
 const SweetAlert = props => {
   const { touched, smsg, errors } = props;
   let { fmsg = 'Oh snap! You got' } = props;
-  console.log(touched);
   const errorsInfo = Object.values(errors);
   const touchedInfo = Object.values(touched);
   if (!touchedInfo.length) return null;
@@ -38,6 +51,9 @@ const SweetAlert = props => {
 
 function FormComponent({ values, errors, touched }) {
   const [point] = useGlobal('points');
+  const valueStatus = values.latitude || values.longitude || false;
+  const errorsStatus = Object.keys(errors).length > 0;
+  const touchedStatus = Object.keys(touched).length > 0;
   const setPoints = useDispatch(
     (point, newPoint) => (point = newPoint),
     'points'
@@ -81,11 +97,24 @@ function FormComponent({ values, errors, touched }) {
         <Row className="justify-content-md-center">
           <Button
             variant="outline-primary"
-            size="md"
-            disabled={touched && Object.keys(errors).length > 0}
+            size="sm"
+            className="ml-1"
+            disabled={!valueStatus || (touchedStatus && errorsStatus)}
             onClick={() => setPoints(values)}
           >
             Show Map{' '}
+            <span aria-label="pizza" role="img">
+              🍕
+            </span>
+          </Button>
+
+          <Button
+            variant="outline-primary"
+            size="sm"
+            className="ml-2"
+            onClick={() => genratePoints().then(val => setPoints(val))}
+          >
+            Random{' '}
             <span aria-label="pizza" role="img">
               🍕
             </span>
