@@ -1,14 +1,12 @@
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Button, Container, Row, Spinner } from 'react-bootstrap';
 import React, { lazy, Suspense, useGlobal, useState } from 'reactn';
+import { useHistory } from 'react-router-dom';
 const ReactMapGL = lazy(() => import('react-map-gl'));
 
-const redirectListener = setPoint => {
-  setPoint(null);
-};
 function MapComponent() {
-  const [point, setPoint] = useGlobal('points');
-
+  const history = useHistory();
+  const [point] = useGlobal('points');
   const { latitude, longitude } = point;
   const [viewPort, setViewPort] = useState({
     width: '100%',
@@ -23,7 +21,7 @@ function MapComponent() {
     <Container>
       <Row>
         <Button
-          onClick={() => redirectListener(setPoint)}
+          onClick={() => history.push('/')}
           variant="outline-secondary"
           style={{
             margin: '0px',
