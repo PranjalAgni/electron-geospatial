@@ -45,7 +45,7 @@
   },
   "devDependencies": {
     "concurrently": "^5.0.2",
-    "electron": "^7.1.7",
+    "electron": "^13.6.6",
     "electron-builder": "^21.2.0",
     "react-map-gl": "^5.2.1",
     "wait-on": "^3.3.0"
